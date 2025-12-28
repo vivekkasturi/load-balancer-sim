@@ -26,3 +26,20 @@
                 ┌──────────▼───────────┐
                 │     Client (UI)      │
                 └──────────────────────┘
+
+
+
+ # Load Balancer — Retry Logic
+
+### What this branch adds
+- Retries another backend server if one fails
+- Keeps round-robin routing
+- Prevents user-facing downtime
+
+### How it works
+1. Select server
+2. If unhealthy → try next
+3. Continue until success or no servers left
+
+### Run
+node loadBalancer.js
