@@ -1,0 +1,19 @@
+{
+  "name": "servers",
+  "version": "1.0.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "server1": "node servers/server1.js",
+    "server2": "node servers/server2.js",
+    "server3": "node servers/server3.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "dotenv": "^17.2.3",
+    "express": "^5.2.1"
+  }
+}
