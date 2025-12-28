@@ -35,36 +35,34 @@ async function healthcheck(url) {
     }
 }
 
-// 
-async function pickupHealthyServer() {
-    console.log(`Picked healthy server:`);
-
-    for (let i = 0; i < servers.length; i++) {
-        const server = getNextServer();
-        const isHealthy = await healthcheck(server);
-        if (isHealthy) {
-            console.log(`Picked healthy server: ${server}`);
+// Retry logic to find a healthy server
+async function getServerWithRetry() {
+    let attempts = 0;
+    while (attempts < servers.length) {
+        let server = getNextServer();
+        let healthyServer = await healthcheck(server);
+        if (healthyServer) {
             return server;
         }
+        attempts++;
     }
-    return null;
 }
 app.get('/', async (req, res) => {
 
-    const healthyServer = await pickupHealthyServer();
+    const server = getServerWithRetry();
 
     try {
 
-        if (healthyServer === null) {
+        if (!server) {
             res.status(503).json({ error: "All target servers are unhealthy" });
             return;
         }
-        const response = await fetch(healthyServer);
+        const response = await fetch(server);
         const data = await response.json();
 
         res.json({
             loadBalancer: `Response from Load Balancer round robin on port ${PORT}`,
-            forwardedTo: healthyServer,
+            forwardedTo: server,
             backendResponse: data
 
         });
