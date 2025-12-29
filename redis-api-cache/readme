@@ -10,3 +10,6 @@ brew services start redis
 cli ping
 ***You will observe: ***
 PONG
+
+***Stop redis service***
+brew services stop redis shutdown via cli
