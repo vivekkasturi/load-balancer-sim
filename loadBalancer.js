@@ -35,38 +35,34 @@ async function healthcheck(url) {
     }
 }
 
-
+// Retry logic to find a healthy server
+async function getServerWithRetry() {
+    let attempts = 0;
+    while (attempts < servers.length) {
+        let server = getNextServer();
+        let healthyServer = await healthcheck(server);
+        if (healthyServer) {
+            return server;
+        }
+        attempts++;
+    }
+}
 app.get('/', async (req, res) => {
 
-    let targetServer = getNextServer();
-    // In a real load balancer, here we would proxy the request to targetServer
-    // below also we can implement retry logic if the server is unhealthy
-    // let attempts = 0;
+    const server = getServerWithRetry();
 
-    // while(attempts < servers.length){
-    //     const isHealthy = await healthcheck(targetServer);
-    //     if(isHealthy){
-    //         break;
-    //     }
-    //     console.log(`Server ${targetServer} is unhealthy. Trying next server.`);
-    //     attempts++;
-    // }
     try {
 
-
-        const serverHealthyStatue = await healthcheck(targetServer);
-        console.log(`Healthcheck for ${targetServer}: ${serverHealthyStatue}`);
-        if (!serverHealthyStatue) {
-            res.status(503).json({ error: "Target server is unhealthy" });
-
-
+        if (!server) {
+            res.status(503).json({ error: "All target servers are unhealthy" });
+            return;
         }
-        const response = await fetch(targetServer);
+        const response = await fetch(server);
         const data = await response.json();
 
         res.json({
             loadBalancer: `Response from Load Balancer round robin on port ${PORT}`,
-            forwardedTo: targetServer,
+            forwardedTo: server,
             backendResponse: data
 
         });

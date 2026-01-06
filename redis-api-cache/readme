@@ -1,0 +1,15 @@
+# 🚀 Redis API Cache (Node.js)
+
+***To install redis(Mac)***
+brew install redis
+
+**To start the services**
+brew services start redis
+
+**Verify service is runningredis**
+cli ping
+***You will observe: ***
+PONG
+
+***Stop redis service***
+brew services stop redis shutdown via cli
